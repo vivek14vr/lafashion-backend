@@ -16,11 +16,17 @@ import { cloudinaryAdapter, isCloudinaryEnabled } from './storage/cloudinary'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-// Public site origin — admin is proxied here at /admin
-const frontendURL = process.env.FRONTEND_URL || 'http://localhost:3000'
-// Prefer the public origin so login/admin links stay on the website
-const serverURL = process.env.NEXT_PUBLIC_SERVER_URL || frontendURL
-const backendURL = process.env.PAYLOAD_BACKEND_URL || 'http://localhost:3001'
+// Public website origin
+const frontendURL = (process.env.FRONTEND_URL || 'http://localhost:3000').replace(/\/$/, '')
+// Where the admin UI is served (frontend proxy origin in local; may be backend URL in prod)
+const serverURL = (
+  process.env.NEXT_PUBLIC_SERVER_URL ||
+  process.env.FRONTEND_URL ||
+  'http://localhost:3000'
+).replace(/\/$/, '')
+const backendURL = (process.env.PAYLOAD_BACKEND_URL || 'http://localhost:3001').replace(/\/$/, '')
+
+const trustedOrigins = Array.from(new Set([frontendURL, serverURL, backendURL].filter(Boolean)))
 
 export default buildConfig({
   serverURL,
@@ -43,8 +49,8 @@ export default buildConfig({
   db: mongooseAdapter({
     url: process.env.DATABASE_URL || '',
   }),
-  cors: [frontendURL, serverURL, backendURL],
-  csrf: [frontendURL, serverURL],
+  cors: trustedOrigins,
+  csrf: trustedOrigins,
   sharp,
   plugins: [
     cloudStoragePlugin({
