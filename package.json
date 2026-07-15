@@ -1,0 +1,39 @@
+{
+  "name": "event-sharon-backend",
+  "version": "1.0.0",
+  "description": "Payload CMS backend for LA Fashion Closet by Shagun",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --port 3001",
+    "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
+    "start": "cross-env NODE_OPTIONS=--no-deprecation next start --port 3001",
+    "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
+    "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
+    "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap"
+  },
+  "dependencies": {
+    "@payloadcms/db-mongodb": "3.86.0",
+    "@payloadcms/next": "3.86.0",
+    "@payloadcms/plugin-cloud-storage": "3.86.0",
+    "@payloadcms/richtext-lexical": "3.86.0",
+    "@payloadcms/ui": "3.86.0",
+    "cloudinary": "^2.10.0",
+    "cross-env": "^7.0.3",
+    "graphql": "^16.8.1",
+    "next": "15.4.11",
+    "payload": "3.86.0",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "sharp": "0.34.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20.9.0"
+  }
+}
