@@ -11,7 +11,7 @@ export const Media: CollectionConfig = {
   admin: {
     useAsTitle: 'filename',
     description:
-      'Images are auto-resized (max 1920px) and compressed to JPEG before Cloudinary. Prefer files under ~15MB for faster uploads on Render.',
+      'Uploads go to Cloudinary (resized there, not on this server). Prefer files under 10MB for the free Cloudinary plan.',
     defaultColumns: ['filename', 'filesize', 'updatedAt'],
   },
   fields: [],
@@ -19,19 +19,7 @@ export const Media: CollectionConfig = {
     mimeTypes: ['image/*'],
     bulkUpload: true,
     displayPreview: true,
-    // Sharp once per file before Cloudinary (keep quality/size modest for Render CPU)
-    resizeOptions: {
-      width: 1920,
-      height: 1920,
-      fit: 'inside',
-      withoutEnlargement: true,
-    },
-    formatOptions: {
-      format: 'jpeg',
-      options: {
-        quality: 78,
-        mozjpeg: true,
-      },
-    },
+    // Avoid Sharp resize/format here — free Render (512MB) OOMs on large runway photos.
+    // Compression is applied via Cloudinary upload transformations instead.
   },
 }

@@ -57,11 +57,11 @@ export const cloudinaryAdapter =
           throw new Error('Cloudinary credentials are missing')
         }
 
-        // Buffer is already resized/compressed by Media upload.formatOptions / resizeOptions
         const baseName = sanitizeBaseName(file.filename)
         const unique = `${baseName}-${Date.now().toString(36)}-${randomBytes(3).toString('hex')}`
         const publicIdPath = path.posix.join(folder, unique)
 
+        // Resize/compress on Cloudinary's servers — keeps Render under 512MB RAM
         const upload = await new Promise<{
           public_id: string
           secure_url: string
@@ -77,6 +77,15 @@ export const cloudinaryAdapter =
               resource_type: 'image',
               overwrite: false,
               unique_filename: true,
+              transformation: [
+                {
+                  width: 1920,
+                  height: 1920,
+                  crop: 'limit',
+                  quality: 'auto:good',
+                  fetch_format: 'auto',
+                },
+              ],
             },
             (error, result) => {
               if (error || !result) {
@@ -98,7 +107,7 @@ export const cloudinaryAdapter =
         })
 
         const mimeType =
-          upload.format === 'jpg' ? 'image/jpeg' : upload.format ? `image/${upload.format}` : 'image/jpeg'
+          upload.format === 'jpg' ? 'image/jpeg' : upload.format ? `image/${upload.format}` : data.mimeType
 
         const url = cloudinaryDeliveryUrl(upload.public_id) || upload.secure_url
 
@@ -107,7 +116,7 @@ export const cloudinaryAdapter =
         data.filesize = upload.bytes
         if (upload.width) data.width = upload.width
         if (upload.height) data.height = upload.height
-        data.mimeType = mimeType
+        if (mimeType) data.mimeType = mimeType
 
         return {
           filename: upload.public_id,
