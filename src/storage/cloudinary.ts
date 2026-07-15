@@ -2,7 +2,6 @@ import type { Adapter, GeneratedAdapter } from '@payloadcms/plugin-cloud-storage
 import { v2 as cloudinary } from 'cloudinary'
 import path from 'path'
 import { randomBytes } from 'crypto'
-import sharp from 'sharp'
 
 type CloudinaryAdapterArgs = {
   folder?: string
@@ -45,24 +44,6 @@ function cloudinaryDeliveryUrl(publicId: string): string {
   return `https://res.cloudinary.com/${cloudName}/image/upload/f_auto,q_auto/${publicId}`
 }
 
-/** Extra pass — shrink large runway shots before they hit Cloudinary. */
-async function compressForUpload(buffer: Buffer): Promise<Buffer> {
-  try {
-    return await sharp(buffer, { failOn: 'none' })
-      .rotate()
-      .resize({
-        width: 2560,
-        height: 2560,
-        fit: 'inside',
-        withoutEnlargement: true,
-      })
-      .jpeg({ quality: 80, mozjpeg: true })
-      .toBuffer()
-  } catch {
-    return buffer
-  }
-}
-
 export const cloudinaryAdapter =
   (args: CloudinaryAdapterArgs = {}): Adapter =>
   () => {
@@ -76,7 +57,7 @@ export const cloudinaryAdapter =
           throw new Error('Cloudinary credentials are missing')
         }
 
-        const compressed = await compressForUpload(file.buffer)
+        // Buffer is already resized/compressed by Media upload.formatOptions / resizeOptions
         const baseName = sanitizeBaseName(file.filename)
         const unique = `${baseName}-${Date.now().toString(36)}-${randomBytes(3).toString('hex')}`
         const publicIdPath = path.posix.join(folder, unique)
@@ -113,7 +94,7 @@ export const cloudinaryAdapter =
             },
           )
 
-          stream.end(compressed)
+          stream.end(file.buffer)
         })
 
         const mimeType =

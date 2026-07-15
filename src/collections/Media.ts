@@ -11,7 +11,7 @@ export const Media: CollectionConfig = {
   admin: {
     useAsTitle: 'filename',
     description:
-      'Images are auto-resized (max 2560px) and compressed to JPEG ~80% before storage. Prefer files under ~25MB for smooth uploads.',
+      'Images are auto-resized (max 1920px) and compressed to JPEG before Cloudinary. Prefer files under ~15MB for faster uploads on Render.',
     defaultColumns: ['filename', 'filesize', 'updatedAt'],
   },
   fields: [],
@@ -19,17 +19,17 @@ export const Media: CollectionConfig = {
     mimeTypes: ['image/*'],
     bulkUpload: true,
     displayPreview: true,
-    // Sharp runs on the original before Cloudinary / local storage
+    // Sharp once per file before Cloudinary (keep quality/size modest for Render CPU)
     resizeOptions: {
-      width: 2560,
-      height: 2560,
+      width: 1920,
+      height: 1920,
       fit: 'inside',
       withoutEnlargement: true,
     },
     formatOptions: {
       format: 'jpeg',
       options: {
-        quality: 80,
+        quality: 78,
         mozjpeg: true,
       },
     },
