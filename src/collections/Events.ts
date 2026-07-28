@@ -47,7 +47,8 @@ export const Events: CollectionConfig = {
         if (data.title) {
           data.slug = slugify(data.title)
         }
-        data.status = statusFromDate(data.date)
+        // Always derive status from the effective date (partial updates included)
+        data.status = statusFromDate(data.date ?? originalDoc?.date)
 
         // Migrate legacy coverImage → portrait/banner when upgrading existing docs
         const legacyCover = data.coverImage ?? originalDoc?.coverImage
@@ -57,6 +58,34 @@ export const Events: CollectionConfig = {
         }
 
         return data
+      },
+    ],
+    afterRead: [
+      async ({ doc, req, context }) => {
+        if (!doc?.date || context?.skipStatusSync) return doc
+
+        const nextStatus = statusFromDate(doc.date)
+        if (doc.status === nextStatus) return doc
+
+        // Correct stale status in the response immediately
+        doc.status = nextStatus
+
+        // Persist so admin list / filters stay accurate (fire-and-forget)
+        if (doc.id) {
+          void req.payload
+            .update({
+              collection: 'events',
+              id: doc.id,
+              data: { status: nextStatus },
+              overrideAccess: true,
+              context: { skipStatusSync: true },
+            })
+            .catch(() => {
+              // Ignore sync failures on read
+            })
+        }
+
+        return doc
       },
     ],
   },

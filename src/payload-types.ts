@@ -151,7 +151,7 @@ export interface User {
   collection: 'users';
 }
 /**
- * Bulk upload photos here, then attach them on a Gallery under Images.
+ * Uploads go to Cloudinary (resized there, not on this server). Prefer files under 10MB for the free Cloudinary plan.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
