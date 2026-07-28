@@ -20,11 +20,27 @@ function firstImageId(images: unknown): string | null {
 
 export const Galleries: CollectionConfig = {
   slug: 'galleries',
+  labels: {
+    singular: 'Gallery',
+    plural: 'Galleries (photo archives)',
+  },
   admin: {
     useAsTitle: 'title',
-    defaultColumns: ['title', 'location', 'date', 'published'],
+    defaultColumns: ['title', 'location', 'date', 'published', 'coverImage'],
+    group: 'Website',
     description:
-      'Photo galleries for past shows — link to a platform event, or create a standalone gallery for shows not listed on the site.',
+      'Photo archives for past shows — powers “Our gallery” on the homepage and the Galleries page. Link to a platform event, or create a standalone gallery.',
+    components: {
+      beforeListTable: ['/components/GalleriesGrid'],
+    },
+  },
+  defaultPopulate: {
+    coverImage: true,
+    images: true,
+    title: true,
+    date: true,
+    location: true,
+    published: true,
   },
   access: {
     read: ({ req: { user } }) => {
@@ -43,16 +59,21 @@ export const Galleries: CollectionConfig = {
         if (data.title) {
           data.slug = slugify(data.title)
         }
+        if (!data.slug) {
+          data.slug = `gallery-${Date.now().toString(36)}`
+        }
         return data
       },
     ],
     beforeChange: [
-      ({ data }) => {
+      ({ data, originalDoc }) => {
         if (!data) return data
         if (data.title) {
           data.slug = slugify(data.title)
         }
-        // Default cover to the first gallery image when empty
+        if (!data.slug) {
+          data.slug = originalDoc?.slug || `gallery-${Date.now().toString(36)}`
+        }
         if (!data.coverImage) {
           const first = firstImageId(data.images)
           if (first) data.coverImage = first
@@ -63,97 +84,145 @@ export const Galleries: CollectionConfig = {
   },
   fields: [
     {
-      name: 'title',
-      type: 'text',
-      required: true,
-      admin: {
-        description: 'Show or gallery name (e.g. Milan Fashion Week 2025).',
-      },
+      type: 'tabs',
+      tabs: [
+        {
+          label: 'Basics',
+          description: 'How this gallery is labeled and linked on the site.',
+          fields: [
+            {
+              name: 'title',
+              type: 'text',
+              required: true,
+              label: 'Gallery title',
+              admin: {
+                description: 'Show or gallery name (e.g. Milan Fashion Week 2025).',
+              },
+            },
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'source',
+                  type: 'select',
+                  defaultValue: 'standalone',
+                  label: 'Gallery type',
+                  options: [
+                    { label: 'Standalone past show (not on platform)', value: 'standalone' },
+                    { label: 'Linked to a platform event', value: 'platform' },
+                  ],
+                  admin: {
+                    width: '50%',
+                    description: 'Standalone for past shows never listed on this site.',
+                  },
+                },
+                {
+                  name: 'event',
+                  type: 'relationship',
+                  relationTo: 'events',
+                  label: 'Linked event',
+                  admin: {
+                    width: '50%',
+                    condition: (_, siblingData) => siblingData?.source === 'platform',
+                    description: 'Only when this gallery belongs to a platform event.',
+                  },
+                },
+              ],
+            },
+            {
+              type: 'row',
+              fields: [
+                {
+                  name: 'date',
+                  type: 'date',
+                  label: 'Show month',
+                  admin: {
+                    width: '50%',
+                    date: {
+                      pickerAppearance: 'monthOnly',
+                      displayFormat: 'MMMM yyyy',
+                    },
+                    description: 'Month the show happened (day not required).',
+                  },
+                },
+                {
+                  name: 'location',
+                  type: 'text',
+                  label: 'Location',
+                  admin: {
+                    width: '50%',
+                    description: 'City or venue when not linked to a platform event.',
+                  },
+                },
+              ],
+            },
+            {
+              name: 'excerpt',
+              type: 'textarea',
+              label: 'Short blurb',
+              admin: {
+                description: 'Shown on the gallery page under the title.',
+              },
+            },
+            {
+              name: 'coverImage',
+              type: 'upload',
+              relationTo: 'media',
+              label: 'Cover / banner image',
+              admin: {
+                description:
+                  'Shown on gallery cards and the homepage. Leave empty to use the first photo from the Photos tab.',
+              },
+            },
+          ],
+        },
+        {
+          label: 'Photos',
+          description: 'Images visitors browse in the gallery.',
+          fields: [
+            {
+              name: 'images',
+              type: 'upload',
+              relationTo: 'media',
+              hasMany: true,
+              required: true,
+              label: 'Gallery photos',
+              admin: {
+                isSortable: true,
+                description:
+                  'Create New or drag & drop to add photos. Drag to reorder how they appear on the site.',
+              },
+            },
+          ],
+        },
+      ],
     },
     {
       name: 'slug',
       type: 'text',
-      required: true,
       unique: true,
+      index: true,
       admin: {
-        position: 'sidebar',
+        hidden: true,
         readOnly: true,
-        description: 'Generated automatically from the title.',
       },
-    },
-    {
-      name: 'source',
-      type: 'select',
-      defaultValue: 'standalone',
-      options: [
-        { label: 'Standalone past show (not on platform)', value: 'standalone' },
-        { label: 'Linked to a platform event', value: 'platform' },
-      ],
-      admin: {
-        description: 'Choose standalone for past events that were never listed on this site.',
-      },
-    },
-    {
-      name: 'event',
-      type: 'relationship',
-      relationTo: 'events',
-      admin: {
-        condition: (_, siblingData) => siblingData?.source === 'platform',
-        description: 'Optional — only when this gallery belongs to an event on the platform.',
-      },
-    },
-    {
-      name: 'date',
-      type: 'date',
-      admin: {
-        date: {
-          pickerAppearance: 'monthOnly',
-          displayFormat: 'MMMM yyyy',
-        },
-        description: 'Month the show happened (day is not required).',
-      },
-    },
-    {
-      name: 'location',
-      type: 'text',
-      admin: {
-        description: 'City or venue for shows not linked to a platform event.',
-      },
-    },
-    {
-      name: 'excerpt',
-      type: 'textarea',
-      admin: {
-        description: 'Short blurb shown on the gallery page.',
-      },
-    },
-    {
-      name: 'images',
-      type: 'upload',
-      relationTo: 'media',
-      hasMany: true,
-      required: true,
-      admin: {
-        isSortable: true,
-        description:
-          'Use Create New or drag & drop here to add gallery photos. They should appear as a list under this field after upload.',
-      },
-    },
-    {
-      name: 'coverImage',
-      type: 'relationship',
-      relationTo: 'media',
-      admin: {
-        appearance: 'select',
-        description: 'Optional — defaults to the first gallery image if left empty.',
+      hooks: {
+        beforeValidate: [
+          ({ value, siblingData }) => {
+            const fromTitle = slugify(siblingData?.title)
+            return fromTitle || value || undefined
+          },
+        ],
       },
     },
     {
       name: 'published',
       type: 'checkbox',
       defaultValue: false,
+      label: 'Published',
       admin: {
         position: 'sidebar',
+        description: 'When checked, this gallery is visible on the public website.',
       },
     },
   ],

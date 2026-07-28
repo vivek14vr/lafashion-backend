@@ -3,10 +3,11 @@ import type { GlobalConfig } from 'payload'
 /** Home page destination cards under Fashion Beyond Borders banner */
 export const HomeDestinations: GlobalConfig = {
   slug: 'home-destinations',
-  label: 'Home destination cards',
+  label: 'Homepage city snaps',
   admin: {
+    group: 'Website',
     description:
-      'Images for the five city cards on the homepage (New Delhi, Los Angeles, Mauritius, Paris, Cannes). Upload several photos per city — they rotate in the card carousel.',
+      'Rotating photos for the five city cards on the homepage (New Delhi, Los Angeles, Mauritius, Paris, Cannes). Upload several photos per city.',
   },
   access: {
     read: () => true,
@@ -16,8 +17,8 @@ export const HomeDestinations: GlobalConfig = {
       name: 'destinations',
       type: 'array',
       labels: {
-        singular: 'Destination',
-        plural: 'Destinations',
+        singular: 'City card',
+        plural: 'City cards',
       },
       minRows: 1,
       maxRows: 8,
@@ -37,15 +38,20 @@ export const HomeDestinations: GlobalConfig = {
           name: 'city',
           type: 'text',
           required: true,
+          label: 'City name',
+          admin: {
+            description: 'Label shown on the homepage card.',
+          },
         },
         {
           name: 'images',
           type: 'upload',
           relationTo: 'media',
           hasMany: true,
+          label: 'Rotating photos',
           admin: {
             isSortable: true,
-            description: 'Create New or drag & drop — photos appear on the home card for this city.',
+            description: 'Create New or drag & drop — photos rotate on this city’s homepage card.',
           },
         },
       ],

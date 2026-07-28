@@ -2,6 +2,10 @@ import type { CollectionConfig } from 'payload'
 
 export const Media: CollectionConfig = {
   slug: 'media',
+  labels: {
+    singular: 'Media file',
+    plural: 'Media library',
+  },
   access: {
     read: () => true,
     create: ({ req: { user } }) => Boolean(user),
@@ -10,9 +14,17 @@ export const Media: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'filename',
+    group: 'Assets',
     description:
-      'Uploads go to Cloudinary (resized there, not on this server). Prefer files under 10MB for the free Cloudinary plan.',
+      'Shared image library used by events, galleries, and homepage city snaps. Uploads go to Cloudinary (prefer files under 10MB).',
     defaultColumns: ['filename', 'filesize', 'updatedAt'],
+    pagination: {
+      defaultLimit: 24,
+      limits: [24, 48, 96],
+    },
+    components: {
+      beforeListTable: ['/components/MediaGrid'],
+    },
   },
   fields: [],
   upload: {

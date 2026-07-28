@@ -71,6 +71,7 @@ export interface Config {
     media: Media;
     events: Event;
     galleries: Gallery;
+    registrations: Registration;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -82,6 +83,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     galleries: GalleriesSelect<false> | GalleriesSelect<true>;
+    registrations: RegistrationsSelect<false> | RegistrationsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -126,6 +128,8 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * People who can sign in to this CMS. These accounts do not appear on the public website.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
@@ -133,6 +137,9 @@ export interface User {
   id: string;
   updatedAt: string;
   createdAt: string;
+  /**
+   * Used to sign in to the admin panel.
+   */
   email: string;
   resetPasswordToken?: string | null;
   resetPasswordExpiration?: string | null;
@@ -151,7 +158,7 @@ export interface User {
   collection: 'users';
 }
 /**
- * Uploads go to Cloudinary (resized there, not on this server). Prefer files under 10MB for the free Cloudinary plan.
+ * Shared image library used by events, galleries, and homepage city snaps. Uploads go to Cloudinary (prefer files under 10MB).
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
@@ -171,56 +178,50 @@ export interface Media {
   focalY?: number | null;
 }
 /**
+ * Runway nights shown on Upcoming nights and the Events page. Edits autosave as drafts — Publish returns you to the events list.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events".
  */
 export interface Event {
   id: string;
-  title: string;
+  createStep?: number | null;
   /**
-   * Generated automatically from the title.
+   * Name visitors see on cards and the event detail page.
    */
-  slug: string;
-  date: string;
-  venue: string;
-  excerpt: string;
-  description?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
+  title?: string | null;
   /**
-   * Portrait image for event cards and listings.
+   * Also sets Upcoming vs Past automatically.
+   */
+  date: string;
+  /**
+   * City, club, or location shown under the title.
+   */
+  venue: string;
+  /**
+   * Shown on event cards and the event detail page.
+   */
+  excerpt?: string | null;
+  /**
+   * Tall image for event cards and listings.
    */
   portraitImage: string | Media;
   /**
-   * Wide banner image for the event detail page hero.
+   * Wide hero for the event detail page.
    */
   bannerImage: string | Media;
   /**
-   * External ticket booking URL
+   * External link for “Book tickets”. Leave empty to hide the button. Use Publish & finish to go live and return to the events list.
    */
   ticketUrl?: string | null;
-  /**
-   * Set automatically from the event date (future → Upcoming, past → Past).
-   */
+  slug?: string | null;
   status: 'upcoming' | 'past';
-  published?: boolean | null;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
- * Photo galleries for past shows — link to a platform event, or create a standalone gallery for shows not listed on the site.
+ * Photo archives for past shows — powers “Our gallery” on the homepage and the Galleries page. Link to a platform event, or create a standalone gallery.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "galleries".
@@ -232,38 +233,102 @@ export interface Gallery {
    */
   title: string;
   /**
-   * Generated automatically from the title.
-   */
-  slug: string;
-  /**
-   * Choose standalone for past events that were never listed on this site.
+   * Standalone for past shows never listed on this site.
    */
   source?: ('standalone' | 'platform') | null;
   /**
-   * Optional — only when this gallery belongs to an event on the platform.
+   * Only when this gallery belongs to a platform event.
    */
   event?: (string | null) | Event;
   /**
-   * Month the show happened (day is not required).
+   * Month the show happened (day not required).
    */
   date?: string | null;
   /**
-   * City or venue for shows not linked to a platform event.
+   * City or venue when not linked to a platform event.
    */
   location?: string | null;
   /**
-   * Short blurb shown on the gallery page.
+   * Shown on the gallery page under the title.
    */
   excerpt?: string | null;
   /**
-   * Use Create New or drag & drop here to add gallery photos. They should appear as a list under this field after upload.
-   */
-  images: (string | Media)[];
-  /**
-   * Optional — defaults to the first gallery image if left empty.
+   * Shown on gallery cards and the homepage. Leave empty to use the first photo from the Photos tab.
    */
   coverImage?: (string | null) | Media;
+  /**
+   * Create New or drag & drop to add photos. Drag to reorder how they appear on the site.
+   */
+  images: (string | Media)[];
+  slug?: string | null;
+  /**
+   * When checked, this gallery is visible on the public website.
+   */
   published?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Model open-call submissions from the public registration form. View only — edits are not allowed.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "registrations".
+ */
+export interface Registration {
+  id: string;
+  /**
+   * Auto-generated from first + last name for list views.
+   */
+  displayName?: string | null;
+  title?: ('mr' | 'ms' | 'other') | null;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+  instagramUrl: string;
+  gender: 'male' | 'female' | 'other';
+  genderOther?: string | null;
+  city: string;
+  state: string;
+  /**
+   * Example: 5'6"
+   */
+  height: string;
+  weight: string;
+  bustChest: string;
+  waist: string;
+  hips: string;
+  dressSize: '0' | '2' | '4' | '6' | '8' | '10' | '12' | '14' | '16';
+  suitSize: 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'XXXL';
+  shoeSize: string;
+  runwayExperience: 'yes' | 'no';
+  locations: ('nyfw' | 'la_fw' | 'las_vegas_fw' | 'milan_fw' | 'paris_fw' | 'cannes_fw' | 'delhi_fw')[];
+  publishedModel: 'yes' | 'no';
+  publishedWhere?: string | null;
+  agencyStatus: 'exclusive' | 'non_exclusive' | 'no';
+  isMinor: 'yes' | 'no';
+  /**
+   * Yes, I am aware that participation in events powered by LA Fashion Closet is not a paid opportunity but provides me a platform for exposure. I agree to participate in events powered by LA Fashion Closet with this understanding. Additionally, I understand that I will have to bear any travel and/or accommodation expenses, including any other expenses related to my participation in the event. LA Fashion Closet is not responsible for any expenses incurred by the model.
+   */
+  consentUnpaid: boolean;
+  /**
+   * Additionally, I understand that I will have to bear any travel and/or accommodation expenses, including any other expenses related to my participation in the event. LA Fashion Closet is not responsible for any expenses incurred by the model.
+   */
+  consentExpenses: boolean;
+  /**
+   * Yes, I agree When posting images/videos to credit all Designers, Hair and makeup Teams, Photographer/Videographer, Sponsors, and any relevant teams @lafcfashionweek @lafashioncloset Production, Staff & Partners. I will provide credit in the form of mentions in comments, tags, stories, posting, and reposts when sharing images to the best of my understanding.
+   */
+  consentCredit: boolean;
+  /**
+   * I acknowledge that this is an open-call event during which photography and videography will occur. I hereby relinquish all rights to any photograph and/or video that includes my likeness to LA Fashion Closet, as well as their representatives. I consent to the editing and publication of these photos and videos on various platforms, including social media, websites, blogs, newsletters, magazines, or any other print/digital media. I waive any rights to review or approve the final products.
+   */
+  consentLikeness: boolean;
+  /**
+   * I, Model, in consideration of my engagement as a model, and for other good and valuable consideration herein acknowledged as received, hereby grant the following rights and permissions to LA Fashion Closet, their legal representatives, and assigns, those for whom Photographer/Videographer is acting, and those acting with his/her authority and permission. I hereby grant to them the unalterable, perpetual and unrestricted right and permission to take, use, reuse, publish, and republish photographic portraits or pictures or videos of me or in which I may be included, in whole or in part, or composite or distorted in character or form, without restriction as to changes or alterations, in conjunction with my own or a fictitious name. I grant them the unalterable, perpetual and unrestricted right and permission to do so in any and all media now or hereafter known. This includes but is not limited to print media and internet distribution for illustration, exhibit, promotion, art, editorial, advertising, trade, magazine, social media or any other purpose whatsoever. I hereby give my consent for the digital compositing or distortion of portraits or pictures or videos, including but not limited to changes or alterations in terms of color, size, shape, perspective, context, foreground or background. I also consent to the use of any published materials in conjunction with such photographs or videos. I waive any right to inspect or approve the finished product or products, and the advertising copy or other matter that may be used in connection with them, or the use to which they may be applied. I release, discharge, and agree to hold harmless LA Fashion Closet and all persons acting under his/her permission or authority from any liability by virtue of any blurring, distortion, alteration, optical illusion, or use in composite form. This is valid for all media submitted or captured in events by LA Fashion Closet. I hereby warrant that I am of full age and have the right to contract in my own name. I have read the above release, and agreement before its execution and I am familiar with its contents. This document is binding upon me and my heirs, legal representatives, and assigns.
+   */
+  consentRelease: boolean;
+  signatureName: string;
+  signatureDate: string;
   updatedAt: string;
   createdAt: string;
 }
@@ -306,6 +371,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'galleries';
         value: string | Gallery;
+      } | null)
+    | ({
+        relationTo: 'registrations';
+        value: string | Registration;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -393,19 +462,19 @@ export interface MediaSelect<T extends boolean = true> {
  * via the `definition` "events_select".
  */
 export interface EventsSelect<T extends boolean = true> {
+  createStep?: T;
   title?: T;
-  slug?: T;
   date?: T;
   venue?: T;
   excerpt?: T;
-  description?: T;
   portraitImage?: T;
   bannerImage?: T;
   ticketUrl?: T;
+  slug?: T;
   status?: T;
-  published?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -413,15 +482,55 @@ export interface EventsSelect<T extends boolean = true> {
  */
 export interface GalleriesSelect<T extends boolean = true> {
   title?: T;
-  slug?: T;
   source?: T;
   event?: T;
   date?: T;
   location?: T;
   excerpt?: T;
-  images?: T;
   coverImage?: T;
+  images?: T;
+  slug?: T;
   published?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "registrations_select".
+ */
+export interface RegistrationsSelect<T extends boolean = true> {
+  displayName?: T;
+  title?: T;
+  firstName?: T;
+  lastName?: T;
+  phone?: T;
+  email?: T;
+  instagramUrl?: T;
+  gender?: T;
+  genderOther?: T;
+  city?: T;
+  state?: T;
+  height?: T;
+  weight?: T;
+  bustChest?: T;
+  waist?: T;
+  hips?: T;
+  dressSize?: T;
+  suitSize?: T;
+  shoeSize?: T;
+  runwayExperience?: T;
+  locations?: T;
+  publishedModel?: T;
+  publishedWhere?: T;
+  agencyStatus?: T;
+  isMinor?: T;
+  consentUnpaid?: T;
+  consentExpenses?: T;
+  consentCredit?: T;
+  consentLikeness?: T;
+  consentRelease?: T;
+  signatureName?: T;
+  signatureDate?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -466,7 +575,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
- * Images for the five city cards on the homepage (New Delhi, Los Angeles, Mauritius, Paris, Cannes). Upload several photos per city — they rotate in the card carousel.
+ * Rotating photos for the five city cards on the homepage (New Delhi, Los Angeles, Mauritius, Paris, Cannes). Upload several photos per city.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "home-destinations".
@@ -478,9 +587,12 @@ export interface HomeDestination {
    */
   destinations?:
     | {
+        /**
+         * Label shown on the homepage card.
+         */
         city: string;
         /**
-         * Create New or drag & drop — photos appear on the home card for this city.
+         * Create New or drag & drop — photos rotate on this city’s homepage card.
          */
         images?: (string | Media)[] | null;
         id?: string | null;

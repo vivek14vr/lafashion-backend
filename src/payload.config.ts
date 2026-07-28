@@ -10,6 +10,7 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Events } from './collections/Events'
 import { Galleries } from './collections/Galleries'
+import { Registrations } from './collections/Registrations'
 import { HomeDestinations } from './globals/HomeDestinations'
 import { cloudinaryAdapter, isCloudinaryEnabled } from './storage/cloudinary'
 
@@ -32,14 +33,22 @@ export default buildConfig({
   serverURL,
   admin: {
     user: Users.slug,
+    theme: 'dark',
     importMap: {
       baseDir: path.resolve(dirname),
     },
     meta: {
       titleSuffix: ' · LA Fashion Closet',
     },
+    components: {
+      beforeDashboard: ['/components/AdminDashboardGuide'],
+      graphics: {
+        Logo: '/components/AdminLogo',
+        Icon: '/components/AdminIcon',
+      },
+    },
   },
-  collections: [Users, Media, Events, Galleries],
+  collections: [Users, Media, Events, Galleries, Registrations],
   globals: [HomeDestinations],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
