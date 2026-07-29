@@ -30,6 +30,27 @@ const cards = [
     tone: 'gold',
   },
   {
+    href: '/admin/collections/registrations',
+    title: 'Model registrations',
+    blurb: 'Open-call model form submissions.',
+    icon: '◇',
+    tone: 'cream',
+  },
+  {
+    href: '/admin/collections/community-registrations',
+    title: 'Community registrations',
+    blurb: 'Creators, media, performers, and more.',
+    icon: '◈',
+    tone: 'copper',
+  },
+  {
+    href: '/admin/collections/designer-registrations',
+    title: 'Designer registrations',
+    blurb: 'Designer open-call form submissions.',
+    icon: '◆',
+    tone: 'gold',
+  },
+  {
     href: '/admin/collections/users',
     title: 'Admin users',
     blurb: 'Who can sign in to this CMS.',

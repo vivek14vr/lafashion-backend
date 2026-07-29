@@ -72,6 +72,8 @@ export interface Config {
     events: Event;
     galleries: Gallery;
     registrations: Registration;
+    'community-registrations': CommunityRegistration;
+    'designer-registrations': DesignerRegistration;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -84,6 +86,8 @@ export interface Config {
     events: EventsSelect<false> | EventsSelect<true>;
     galleries: GalleriesSelect<false> | GalleriesSelect<true>;
     registrations: RegistrationsSelect<false> | RegistrationsSelect<true>;
+    'community-registrations': CommunityRegistrationsSelect<false> | CommunityRegistrationsSelect<true>;
+    'designer-registrations': DesignerRegistrationsSelect<false> | DesignerRegistrationsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -333,6 +337,106 @@ export interface Registration {
   createdAt: string;
 }
 /**
+ * Community open-call submissions (creators, media, performers, influencers, volunteers, sponsors, MUAs). View only — edits are not allowed.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "community-registrations".
+ */
+export interface CommunityRegistration {
+  id: string;
+  /**
+   * Auto-generated from first + last name for list views.
+   */
+  displayName?: string | null;
+  role: 'content_creator' | 'press_media' | 'performer' | 'influencer' | 'volunteer' | 'sponsor' | 'mua' | 'other';
+  roleOther?: string | null;
+  title?: ('mr' | 'ms' | 'other') | null;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+  instagramUrl: string;
+  gender: 'male' | 'female' | 'other';
+  genderOther?: string | null;
+  city: string;
+  state: string;
+  locations: ('nyfw' | 'la_fw' | 'las_vegas_fw' | 'milan_fw' | 'paris_fw' | 'london_fw' | 'delhi_fw')[];
+  isMinor: 'yes' | 'no';
+  /**
+   * Yes, I am aware that participation in events powered by LA Fashion Closet is not a paid opportunity but provides me a platform for exposure. I agree to participate in events powered by LA Fashion Closet with this understanding. Additionally, I understand that I will have to bear any travel and/or accommodation expenses, including any other expenses related to my participation in the event. LA Fashion Closet is not responsible for any expenses incurred.
+   */
+  consentUnpaid: boolean;
+  /**
+   * Yes, I agree When posting images/videos to credit all Designers, Hair and makeup Teams, Photographer/Videographer, Sponsors, and any relevant teams @lafcfashionweek @lafashioncloset Production, Staff & Partners. I will provide credit in the form of mentions in comments, tags, stories, posting, and reposts when sharing images to the best of my understanding.
+   */
+  consentCredit: boolean;
+  /**
+   * I acknowledge that this is an open-call event during which photography and videography will occur. I hereby relinquish all rights to any photograph and/or video that includes my likeness to LA Fashion Closet, as well as their representatives. I consent to the editing and publication of these photos and videos on various platforms, including social media, websites, blogs, newsletters, magazines, or any other print/digital media. I waive any rights to review or approve the final products.
+   */
+  consentLikeness: boolean;
+  /**
+   * I, Photographer/Videographer/Other Media, hereby grant and authorize LA Fashion Closet the right to take, edit, alter, copy, exhibit, publish, distribute and make use of any and all pictures or video taken by myself to be used in and/or for legally promotional materials including, but not limited to, newsletters, flyers, posters, brochures, fundraising letters, annual reports, press kits and submissions to journalists, websites, magazines, social networking sites and other print and digital communications, without payment or any other consideration. This authorization extends to all languages, media, formats and markets now known or hereafter devised. This authorization shall continue indefinitely for all media submitted or captured in events by LA Fashion Closet, unless I otherwise revoke said authorization in writing. I understand and agree that these materials shall become the property of LA Fashion Closet and will not be returned. I hereby hold harmless, and release LA Fashion Closet from all liability, petitions, and causes of action which I, my heirs, representative, executors, administrators, or any other persons may make while acting on my behalf or on behalf of my estate. I hereby agree that I will upload all photos/videos taken by me to the drive/location as specified by LA Fashion Closet.
+   */
+  consentMedia: boolean;
+  signatureName: string;
+  signatureDate: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Designer open-call submissions from the public registration form. View only — edits are not allowed.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "designer-registrations".
+ */
+export interface DesignerRegistration {
+  id: string;
+  /**
+   * Auto-generated from first + last name for list views.
+   */
+  displayName?: string | null;
+  title?: ('mr' | 'ms' | 'other') | null;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  email: string;
+  instagramUrl: string;
+  looks: '12' | '20' | '30' | 'other';
+  looksOther?: string | null;
+  retailCategory:
+    | 'athleisure'
+    | 'accessories'
+    | 'activewear_sportswear'
+    | 'bridal'
+    | 'eveningwear_gowns'
+    | 'indigenous'
+    | 'kids_youth'
+    | 'lingerie'
+    | 'resort_swimwear'
+    | 'streetwear'
+    | 'suits'
+    | 'upcycling_organic'
+    | 'other';
+  retailCategoryOther?: string | null;
+  city: string;
+  state: string;
+  runwayExperience: 'yes' | 'no';
+  locations: ('nyfw' | 'la_fw' | 'las_vegas_fw' | 'milan_fw' | 'paris_fw' | 'london_fw' | 'india_fw' | 'cannes_fw')[];
+  isMinor: 'yes' | 'no';
+  /**
+   * Yes, I agree When posting images/videos to credit Hair and makeup Teams, Photographer/Videographer, Sponsors, and any relevant teams @lafcfashionweek @lafashioncloset Production, Staff & Partners. I will provide credit in the form of mentions in comments, tags, stories, posting, and reposts when sharing images to the best of my understanding.
+   */
+  consentCredit: boolean;
+  /**
+   * I acknowledge that this is an open-call event during which photography and videography will occur. I hereby relinquish all rights to any photograph and/or video that includes my likeness to LA Fashion Closet, as well as their representatives. I consent to the editing and publication of these photos and videos on various platforms, including social media, websites, blogs, newsletters, magazines, or any other print/digital media. I waive any rights to review or approve the final products.
+   */
+  consentLikeness: boolean;
+  signatureName: string;
+  signatureDate: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -375,6 +479,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'registrations';
         value: string | Registration;
+      } | null)
+    | ({
+        relationTo: 'community-registrations';
+        value: string | CommunityRegistration;
+      } | null)
+    | ({
+        relationTo: 'designer-registrations';
+        value: string | DesignerRegistration;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -529,6 +641,63 @@ export interface RegistrationsSelect<T extends boolean = true> {
   consentCredit?: T;
   consentLikeness?: T;
   consentRelease?: T;
+  signatureName?: T;
+  signatureDate?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "community-registrations_select".
+ */
+export interface CommunityRegistrationsSelect<T extends boolean = true> {
+  displayName?: T;
+  role?: T;
+  roleOther?: T;
+  title?: T;
+  firstName?: T;
+  lastName?: T;
+  phone?: T;
+  email?: T;
+  instagramUrl?: T;
+  gender?: T;
+  genderOther?: T;
+  city?: T;
+  state?: T;
+  locations?: T;
+  isMinor?: T;
+  consentUnpaid?: T;
+  consentCredit?: T;
+  consentLikeness?: T;
+  consentMedia?: T;
+  signatureName?: T;
+  signatureDate?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "designer-registrations_select".
+ */
+export interface DesignerRegistrationsSelect<T extends boolean = true> {
+  displayName?: T;
+  title?: T;
+  firstName?: T;
+  lastName?: T;
+  phone?: T;
+  email?: T;
+  instagramUrl?: T;
+  looks?: T;
+  looksOther?: T;
+  retailCategory?: T;
+  retailCategoryOther?: T;
+  city?: T;
+  state?: T;
+  runwayExperience?: T;
+  locations?: T;
+  isMinor?: T;
+  consentCredit?: T;
+  consentLikeness?: T;
   signatureName?: T;
   signatureDate?: T;
   updatedAt?: T;

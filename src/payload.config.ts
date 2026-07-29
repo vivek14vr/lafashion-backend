@@ -11,6 +11,8 @@ import { Media } from './collections/Media'
 import { Events } from './collections/Events'
 import { Galleries } from './collections/Galleries'
 import { Registrations } from './collections/Registrations'
+import { CommunityRegistrations } from './collections/CommunityRegistrations'
+import { DesignerRegistrations } from './collections/DesignerRegistrations'
 import { HomeDestinations } from './globals/HomeDestinations'
 import { cloudinaryAdapter, isCloudinaryEnabled } from './storage/cloudinary'
 
@@ -48,7 +50,15 @@ export default buildConfig({
       },
     },
   },
-  collections: [Users, Media, Events, Galleries, Registrations],
+  collections: [
+    Users,
+    Media,
+    Events,
+    Galleries,
+    Registrations,
+    CommunityRegistrations,
+    DesignerRegistrations,
+  ],
   globals: [HomeDestinations],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
