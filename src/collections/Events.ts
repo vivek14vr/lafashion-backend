@@ -71,6 +71,7 @@ export const Events: CollectionConfig = {
     maxPerDoc: 25,
   },
   access: {
+    create: ({ req: { user } }) => Boolean(user),
     read: ({ req: { user } }) => {
       if (user) return true
       return {
@@ -79,6 +80,8 @@ export const Events: CollectionConfig = {
         },
       }
     },
+    update: ({ req: { user } }) => Boolean(user),
+    delete: ({ req: { user } }) => Boolean(user),
   },
   hooks: {
     beforeValidate: [
