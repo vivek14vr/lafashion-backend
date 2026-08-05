@@ -1,6 +1,6 @@
 import { mongooseAdapter } from '@payloadcms/db-mongodb'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
-import { cloudStoragePlugin } from '@payloadcms/plugin-cloud-storage'
+import { s3Storage } from '@payloadcms/storage-s3'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
@@ -14,7 +14,6 @@ import { Registrations } from './collections/Registrations'
 import { CommunityRegistrations } from './collections/CommunityRegistrations'
 import { DesignerRegistrations } from './collections/DesignerRegistrations'
 import { HomeDestinations } from './globals/HomeDestinations'
-import { cloudinaryAdapter, isCloudinaryEnabled } from './storage/cloudinary'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -30,6 +29,7 @@ const serverURL = (
 const backendURL = (process.env.PAYLOAD_BACKEND_URL || 'http://localhost:3001').replace(/\/$/, '')
 
 const trustedOrigins = Array.from(new Set([frontendURL, serverURL, backendURL].filter(Boolean)))
+const isS3Enabled = Boolean(process.env.S3_BUCKET?.trim() && process.env.S3_REGION?.trim())
 
 export default buildConfig({
   serverURL,
@@ -72,28 +72,24 @@ export default buildConfig({
   csrf: trustedOrigins,
   sharp,
   plugins: [
-    cloudStoragePlugin({
-      enabled: isCloudinaryEnabled(),
+    s3Storage({
+      enabled: isS3Enabled,
+      bucket: process.env.S3_BUCKET || '',
+      config: {
+        region: process.env.S3_REGION || 'us-east-2',
+      },
+      signedDownloads: true,
       collections: {
         media: {
-          adapter: cloudinaryAdapter({
-            folder: process.env.CLOUDINARY_FOLDER || 'la-fashion-closet',
-          }),
-          // Serve files from Cloudinary CDN URLs (not /api/media/file/...)
-          disableLocalStorage: true,
-          disablePayloadAccessControl: true,
+          prefix: process.env.S3_PREFIX || 'lafashioncloset',
         },
       },
     }),
   ],
 })
 
-if (isCloudinaryEnabled()) {
-  console.info(
-    `[payload] Cloudinary enabled → folder "${process.env.CLOUDINARY_FOLDER || 'la-fashion-closet'}"`,
-  )
-} else {
-  console.info(
-    '[payload] Cloudinary not configured — media saved under backend/media. Set CLOUDINARY_* in backend/.env to enable.',
-  )
-}
+console.info(
+  isS3Enabled
+    ? `[payload] S3 storage enabled → bucket "${process.env.S3_BUCKET}"`
+    : '[payload] S3 storage disabled — set S3_BUCKET and S3_REGION to enable media storage.',
+)

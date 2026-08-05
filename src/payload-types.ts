@@ -162,7 +162,7 @@ export interface User {
   collection: 'users';
 }
 /**
- * Shared image library used by events, galleries, and homepage city snaps. Uploads go to Cloudinary (prefer files under 10MB).
+ * Shared image library used by events, galleries, and homepage city snaps. Uploads go to private Amazon S3 storage.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".

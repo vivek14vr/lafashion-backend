@@ -25,7 +25,7 @@ const cards = [
   {
     href: '/admin/collections/media',
     title: 'Media',
-    blurb: 'Shared Cloudinary image library.',
+    blurb: 'Shared private S3 image library.',
     icon: '◡',
     tone: 'gold',
   },

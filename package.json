@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev --port 3001",
     "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
-    "start": "cross-env NODE_OPTIONS=--no-deprecation next start --port 3001",
+    "start": "cross-env NODE_OPTIONS=--no-deprecation next start --hostname 127.0.0.1 --port 3001",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap"
@@ -17,8 +17,8 @@
     "@payloadcms/next": "3.86.0",
     "@payloadcms/plugin-cloud-storage": "3.86.0",
     "@payloadcms/richtext-lexical": "3.86.0",
+    "@payloadcms/storage-s3": "^3.86.0",
     "@payloadcms/ui": "3.86.0",
-    "cloudinary": "^2.10.0",
     "cross-env": "^7.0.3",
     "graphql": "^16.8.1",
     "next": "15.4.11",

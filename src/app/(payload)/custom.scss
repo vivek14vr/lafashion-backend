@@ -78,6 +78,33 @@ html[data-theme='dark'] {
   background: color-mix(in srgb, var(--laf-muted) 88%, var(--laf-champagne) 4%) !important;
   border-bottom: 1px solid var(--laf-border-gold) !important;
   backdrop-filter: blur(8px);
+  min-height: 4rem !important;
+  padding-block: 0.45rem !important;
+}
+
+/* Keep the compact brand and breadcrumb aligned in the header. */
+.app-header__content {
+  min-height: 3rem !important;
+  align-items: center !important;
+  gap: 0.85rem !important;
+  overflow: visible !important;
+}
+
+.app-header__logo,
+.app-header__brand,
+.app-header__brand-link {
+  width: auto !important;
+  min-width: 2.75rem !important;
+  overflow: visible !important;
+}
+
+.app-header .laf-brand-mark {
+  width: 2.55rem !important;
+  min-width: 2.55rem !important;
+  height: 2.55rem !important;
+  font-size: 0.64rem !important;
+  letter-spacing: 0.02em !important;
+  white-space: nowrap !important;
 }
 
 /* ─── Nav with icons ─── */
@@ -201,7 +228,7 @@ a.nav__link[href*='/globals/home-destinations']::before {
   flex-wrap: wrap;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 1rem 1.25rem;
+  gap: 0.65rem 1.25rem;
   width: 100%;
 }
 
@@ -210,13 +237,22 @@ a.nav__link[href*='/globals/home-destinations']::before {
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 0.85rem 1.25rem;
+  gap: 0.6rem 1.25rem;
   width: 100%;
 }
 
 .collection-list .list-header__title {
   flex: 1 1 auto;
   min-width: 12rem;
+  margin: 0 !important;
+}
+
+.collection-list .list-header {
+  margin-bottom: 0.85rem !important;
+}
+
+.collection-list .list-controls {
+  margin-top: 0.65rem !important;
 }
 
 .collection-list .list-header__title-actions {
@@ -268,6 +304,70 @@ a.nav__link[href*='/globals/home-destinations']::before {
   color: var(--laf-champagne-soft) !important;
   font-size: 0.9rem !important;
   font-weight: 650 !important;
+}
+
+/* ─── Compact admin shell ───
+ * Keep the Payload header and collection toolbar on a consistent rhythm.
+ * The default flex rules can create an unnecessary second line of space when
+ * the breadcrumb and actions are present.
+ */
+.app-header {
+  min-height: 3.5rem !important;
+  padding-block: 0 !important;
+}
+
+.app-header__content {
+  min-height: 3.5rem !important;
+  height: 3.5rem !important;
+  padding-inline: 1rem !important;
+  gap: 0.65rem !important;
+}
+
+.app-header__logo,
+.app-header__brand,
+.app-header__brand-link {
+  display: flex !important;
+  align-items: center !important;
+  flex: 0 0 auto !important;
+  min-width: 2.55rem !important;
+  height: 100% !important;
+}
+
+.app-header__content > * {
+  margin-block: 0 !important;
+}
+
+.collection-list {
+  padding-top: 0.55rem !important;
+}
+
+.collection-list .list-header {
+  margin: 0 0 0.55rem !important;
+}
+
+.collection-list .list-header__content,
+.collection-list .list-header__title-and-actions {
+  row-gap: 0.3rem !important;
+}
+
+.collection-list .list-header__title-actions {
+  gap: 0.45rem !important;
+}
+
+.collection-list .list-header__description,
+.collection-list .list-header__subtitle {
+  margin-top: 0.25rem !important;
+  margin-bottom: 0 !important;
+}
+
+.collection-list .list-controls {
+  margin-top: 0.45rem !important;
+  margin-bottom: 0 !important;
+}
+
+.collection-list .table-wrap,
+.collection-list .table {
+  margin-top: 0.7rem !important;
 }
 
 /* Document layout — use full available width (sidebar + main) */
@@ -976,7 +1076,7 @@ a.nav__link[href*='/globals/home-destinations']::before {
 /* ─── Events / Galleries list grids ─── */
 .laf-events-grid,
 .laf-galleries-grid {
-  margin: 0.5rem 0 1.5rem;
+  margin: 0.7rem 0 1.25rem;
 }
 
 .laf-events-grid--empty,
@@ -996,7 +1096,7 @@ a.nav__link[href*='/globals/home-destinations']::before {
   padding: 0;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1rem;
+  gap: 1.15rem;
 }
 
 .laf-events-grid__card,

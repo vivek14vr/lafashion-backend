@@ -16,7 +16,7 @@ export const Media: CollectionConfig = {
     useAsTitle: 'filename',
     group: 'Assets',
     description:
-      'Shared image library used by events, galleries, and homepage city snaps. Uploads go to Cloudinary (prefer files under 10MB).',
+      'Shared image library used by events, galleries, and homepage city snaps. Uploads go to private Amazon S3 storage.',
     defaultColumns: ['filename', 'filesize', 'updatedAt'],
     pagination: {
       defaultLimit: 24,
@@ -31,7 +31,7 @@ export const Media: CollectionConfig = {
     mimeTypes: ['image/*'],
     bulkUpload: true,
     displayPreview: true,
-    // Avoid Sharp resize/format here — free Render (512MB) OOMs on large runway photos.
-    // Compression is applied via Cloudinary upload transformations instead.
+    // S3 stores the source file privately; Payload serves authorized downloads
+    // with signed URLs.
   },
 }

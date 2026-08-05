@@ -16,7 +16,11 @@ export const Users: CollectionConfig = {
     // Same host (localhost / production domain) for site proxy + CMS
     cookies: {
       sameSite: 'Lax',
-      secure: process.env.NODE_ENV === 'production',
+      // The current deployment is HTTP behind Nginx. Secure cookies are only
+      // accepted by browsers over HTTPS, so derive this from the public URL.
+      secure:
+        process.env.NODE_ENV === 'production' &&
+        (process.env.FRONTEND_URL || '').startsWith('https://'),
     },
   },
   fields: [
