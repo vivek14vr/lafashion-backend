@@ -33,11 +33,6 @@ export const Registrations: CollectionConfig = {
     group: 'Website',
     description:
       'Model open-call submissions from the public registration form. View only — edits are not allowed.',
-    components: {
-      edit: {
-        SaveButton: '/components/RegistrationSaveButton',
-      },
-    },
   },
   access: {
     // Public form (no user) can create; admins cannot create/edit in the panel

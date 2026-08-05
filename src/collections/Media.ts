@@ -22,9 +22,6 @@ export const Media: CollectionConfig = {
       defaultLimit: 24,
       limits: [24, 48, 96],
     },
-    components: {
-      beforeListTable: ['/components/MediaGrid'],
-    },
   },
   fields: [],
   upload: {

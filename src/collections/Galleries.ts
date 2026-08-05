@@ -30,9 +30,6 @@ export const Galleries: CollectionConfig = {
     group: 'Website',
     description:
       'Photo archives for past shows — powers “Our gallery” on the homepage and the Galleries page. Link to a platform event, or create a standalone gallery.',
-    components: {
-      beforeListTable: ['/components/GalleriesGrid'],
-    },
   },
   defaultPopulate: {
     coverImage: true,

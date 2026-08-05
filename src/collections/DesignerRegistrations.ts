@@ -19,11 +19,6 @@ export const DesignerRegistrations: CollectionConfig = {
     group: 'Website',
     description:
       'Designer open-call submissions from the public registration form. View only — edits are not allowed.',
-    components: {
-      edit: {
-        SaveButton: '/components/RegistrationSaveButton',
-      },
-    },
   },
   access: {
     create: ({ req: { user } }) => !user,

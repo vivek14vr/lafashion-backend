@@ -30,11 +30,6 @@ export const CommunityRegistrations: CollectionConfig = {
     group: 'Website',
     description:
       'Community open-call submissions (creators, media, performers, influencers, volunteers, sponsors, MUAs). View only — edits are not allowed.',
-    components: {
-      edit: {
-        SaveButton: '/components/RegistrationSaveButton',
-      },
-    },
   },
   access: {
     create: ({ req: { user } }) => !user,

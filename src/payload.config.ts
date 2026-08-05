@@ -42,13 +42,6 @@ export default buildConfig({
     meta: {
       titleSuffix: ' · LA Fashion Closet',
     },
-    components: {
-      beforeDashboard: ['/components/AdminDashboardGuide'],
-      graphics: {
-        Logo: '/components/AdminLogo',
-        Icon: '/components/AdminIcon',
-      },
-    },
   },
   collections: [
     Users,

@@ -53,12 +53,6 @@ export const Events: CollectionConfig = {
     group: 'Website',
     description:
       'Runway nights shown on Upcoming nights and the Events page. Edits autosave as drafts — Publish returns you to the events list.',
-    components: {
-      beforeListTable: ['/components/EventsGrid'],
-      edit: {
-        PublishButton: '/components/EventPublishButton',
-      },
-    },
   },
   defaultPopulate: {
     portraitImage: true,
@@ -160,12 +154,7 @@ export const Events: CollectionConfig = {
       min: 1,
       max: 3,
       label: false,
-      admin: {
-        disableListColumn: true,
-        components: {
-          Field: '/components/EventStepNav',
-        },
-      },
+      admin: { disableListColumn: true },
     },
     // Step 1 — Basics
     {
