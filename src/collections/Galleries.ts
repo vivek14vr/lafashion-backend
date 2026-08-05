@@ -40,6 +40,7 @@ export const Galleries: CollectionConfig = {
     published: true,
   },
   access: {
+    create: ({ req: { user } }) => Boolean(user),
     read: ({ req: { user } }) => {
       if (user) return true
       return {
@@ -48,6 +49,8 @@ export const Galleries: CollectionConfig = {
         },
       }
     },
+    update: ({ req: { user } }) => Boolean(user),
+    delete: ({ req: { user } }) => Boolean(user),
   },
   hooks: {
     beforeValidate: [
