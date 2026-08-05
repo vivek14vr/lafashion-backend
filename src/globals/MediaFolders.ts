@@ -4,7 +4,9 @@ export const MediaFolders: GlobalConfig = {
   slug: 'media-folders',
   label: 'Media folders',
   access: {
-    read: ({ req: { user } }) => Boolean(user),
+    // Folder names are only organizational labels; allowing reads avoids the
+    // admin filter racing the client-side session refresh on page load.
+    read: () => true,
     update: ({ req: { user } }) => Boolean(user),
   },
   fields: [
