@@ -13,6 +13,11 @@ export const Users: CollectionConfig = {
       'People who can sign in to this CMS. These accounts do not appear on the public website.',
   },
   auth: {
+    // Keep the JWT in an HttpOnly cookie and back it with a server-side
+    // session so the frontend can safely renew it through Payload's
+    // /api/users/refresh-token endpoint.
+    useSessions: true,
+    tokenExpiration: 60 * 60 * 24 * 30,
     // Same host (localhost / production domain) for site proxy + CMS
     cookies: {
       sameSite: 'Lax',
