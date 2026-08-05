@@ -21,7 +21,8 @@ export const DesignerRegistrations: CollectionConfig = {
       'Designer open-call submissions from the public registration form. View only — edits are not allowed.',
   },
   access: {
-    create: ({ req: { user } }) => !user,
+    // The public form must remain usable even when the browser has an admin session.
+    create: () => true,
     read: ({ req: { user } }) => Boolean(user),
     update: () => false,
     delete: ({ req: { user } }) => Boolean(user),

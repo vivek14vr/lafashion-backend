@@ -32,7 +32,8 @@ export const CommunityRegistrations: CollectionConfig = {
       'Community open-call submissions (creators, media, performers, influencers, volunteers, sponsors, MUAs). View only — edits are not allowed.',
   },
   access: {
-    create: ({ req: { user } }) => !user,
+    // The public form must remain usable even when the browser has an admin session.
+    create: () => true,
     read: ({ req: { user } }) => Boolean(user),
     update: () => false,
     delete: ({ req: { user } }) => Boolean(user),

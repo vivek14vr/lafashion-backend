@@ -35,8 +35,8 @@ export const Registrations: CollectionConfig = {
       'Model open-call submissions from the public registration form. View only — edits are not allowed.',
   },
   access: {
-    // Public form (no user) can create; admins cannot create/edit in the panel
-    create: ({ req: { user } }) => !user,
+    // The public form must remain usable even when the browser has an admin session.
+    create: () => true,
     read: ({ req: { user } }) => Boolean(user),
     update: () => false,
     delete: ({ req: { user } }) => Boolean(user),
