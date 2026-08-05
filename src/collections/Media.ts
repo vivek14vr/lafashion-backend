@@ -23,7 +23,16 @@ export const Media: CollectionConfig = {
       limits: [24, 48, 96],
     },
   },
-  fields: [],
+  fields: [
+    {
+      name: 'folder',
+      type: 'text',
+      label: 'Folder',
+      admin: {
+        description: 'Optional folder used to organize media in the admin library.',
+      },
+    },
+  ],
   upload: {
     mimeTypes: ['image/*'],
     bulkUpload: true,

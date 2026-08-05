@@ -14,6 +14,7 @@ import { Registrations } from './collections/Registrations'
 import { CommunityRegistrations } from './collections/CommunityRegistrations'
 import { DesignerRegistrations } from './collections/DesignerRegistrations'
 import { HomeDestinations } from './globals/HomeDestinations'
+import { MediaFolders } from './globals/MediaFolders'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -53,7 +54,7 @@ export default buildConfig({
     CommunityRegistrations,
     DesignerRegistrations,
   ],
-  globals: [HomeDestinations],
+  globals: [HomeDestinations, MediaFolders],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
