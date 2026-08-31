@@ -35,3 +35,12 @@ export const genderOptions = [
   { label: 'Female', value: 'female' },
   { label: 'Other', value: 'other' },
 ]
+
+export const submissionStatusOptions = [
+  { label: 'New submission', value: 'new' },
+  { label: 'Contacted', value: 'contacted' },
+  { label: 'Shortlisted', value: 'shortlisted' },
+  { label: 'Approved', value: 'approved' },
+  { label: 'Rejected', value: 'rejected' },
+  { label: 'Archived', value: 'archived' },
+]

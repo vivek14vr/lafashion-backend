@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 import {
   genderOptions,
   titleOptions,
+  submissionStatusOptions,
   viewOnlyFields,
   yesNoOptions,
 } from './registrationShared'
@@ -29,13 +30,13 @@ export const CommunityRegistrations: CollectionConfig = {
     defaultColumns: ['displayName', 'role', 'email', 'phone', 'city', 'createdAt'],
     group: 'Website',
     description:
-      'Community open-call submissions (creators, media, performers, influencers, volunteers, sponsors, MUAs). View only — edits are not allowed.',
+      'Community open-call submissions (creators, media, performers, influencers, volunteers, sponsors, MUAs). Submitted details are read-only; admins can update workflow status.',
   },
   access: {
     // The public form must remain usable even when the browser has an admin session.
     create: () => true,
     read: ({ req: { user } }) => Boolean(user),
-    update: () => false,
+    update: ({ req: { user } }) => Boolean(user),
     delete: ({ req: { user } }) => Boolean(user),
   },
   hooks: {
@@ -45,11 +46,12 @@ export const CommunityRegistrations: CollectionConfig = {
         const first = String(data.firstName || '').trim()
         const last = String(data.lastName || '').trim()
         data.displayName = [first, last].filter(Boolean).join(' ') || data.email || 'Registration'
+        data.status = data.status || 'new'
         return data
       },
     ],
   },
-  fields: viewOnlyFields([
+  fields: [{ name: 'status', type: 'select', defaultValue: 'new', options: submissionStatusOptions, admin: { description: 'Internal workflow status. Submitted form details remain read-only.' } }, ...viewOnlyFields([
     {
       name: 'displayName',
       type: 'text',
@@ -273,5 +275,5 @@ export const CommunityRegistrations: CollectionConfig = {
         },
       ],
     },
-  ]),
+  ])],
 }
