@@ -18,14 +18,13 @@ export const Users: CollectionConfig = {
     // /api/users/refresh-token endpoint.
     useSessions: true,
     tokenExpiration: 60 * 60 * 24 * 30,
-    // Same host (localhost / production domain) for site proxy + CMS
+    // The site is served from both the apex and www hostnames. Share the
+    // session across those two official hostnames so a login cannot vanish
+    // during an apex/www redirect or navigation.
     cookies: {
+      domain: process.env.NODE_ENV === 'production' ? '.lafashioncloset.com' : undefined,
       sameSite: 'Lax',
-      // The current deployment is HTTP behind Nginx. Secure cookies are only
-      // accepted by browsers over HTTPS, so derive this from the public URL.
-      secure:
-        process.env.NODE_ENV === 'production' &&
-        (process.env.FRONTEND_URL || '').startsWith('https://'),
+      secure: process.env.NODE_ENV === 'production',
     },
   },
   fields: [
