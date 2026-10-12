@@ -33,6 +33,9 @@ function isPrivateS3Media(value: unknown): boolean {
 
   try {
     const url = new URL(rawURL)
+    // Payload's protected file route is private regardless of whether the
+    // serialized URL uses the backend, apex, www, or EC2 hostname.
+    if (url.pathname.startsWith('/api/media/file/')) return true
     if (url.hostname.endsWith('.amazonaws.com')) return true
     if (!url.pathname.startsWith('/api/media/file/')) return false
 
