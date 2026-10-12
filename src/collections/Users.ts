@@ -1,5 +1,25 @@
 import type { CollectionConfig } from 'payload'
 
+function authCookieSecure(): boolean {
+  if (process.env.AUTH_COOKIE_SECURE === 'true') return true
+  if (process.env.AUTH_COOKIE_SECURE === 'false') return false
+  return (process.env.FRONTEND_URL || '').startsWith('https://')
+}
+
+function authCookieDomain(): string | undefined {
+  const configured = process.env.AUTH_COOKIE_DOMAIN?.trim()
+  if (configured) return configured
+
+  try {
+    const hostname = new URL(process.env.FRONTEND_URL || '').hostname
+    return hostname === 'lafashioncloset.com' || hostname.endsWith('.lafashioncloset.com')
+      ? '.lafashioncloset.com'
+      : undefined
+  } catch {
+    return undefined
+  }
+}
+
 export const Users: CollectionConfig = {
   slug: 'users',
   labels: {
@@ -22,9 +42,9 @@ export const Users: CollectionConfig = {
     // session across those two official hostnames so a login cannot vanish
     // during an apex/www redirect or navigation.
     cookies: {
-      domain: process.env.NODE_ENV === 'production' ? '.lafashioncloset.com' : undefined,
+      domain: authCookieDomain(),
       sameSite: 'Lax',
-      secure: process.env.NODE_ENV === 'production',
+      secure: authCookieSecure(),
     },
   },
   fields: [

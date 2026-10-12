@@ -37,6 +37,21 @@ export const Media: CollectionConfig = {
     mimeTypes: ['image/*'],
     bulkUpload: true,
     displayPreview: true,
+    adminThumbnail: 'adminThumbnail',
+    imageSizes: [
+      {
+        name: 'adminThumbnail',
+        width: 360,
+        height: 360,
+        position: 'centre',
+        withoutEnlargement: true,
+        admin: {
+          disableGroupBy: true,
+          disableListColumn: true,
+          disableListFilter: true,
+        },
+      },
+    ],
     // S3 stores the source file privately; Payload serves authorized downloads
     // with signed URLs.
   },

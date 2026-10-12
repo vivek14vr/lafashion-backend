@@ -74,6 +74,7 @@ export interface Config {
     registrations: Registration;
     'community-registrations': CommunityRegistration;
     'designer-registrations': DesignerRegistration;
+    'press-releases': PressRelease;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -88,6 +89,7 @@ export interface Config {
     registrations: RegistrationsSelect<false> | RegistrationsSelect<true>;
     'community-registrations': CommunityRegistrationsSelect<false> | CommunityRegistrationsSelect<true>;
     'designer-registrations': DesignerRegistrationsSelect<false> | DesignerRegistrationsSelect<true>;
+    'press-releases': PressReleasesSelect<false> | PressReleasesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -99,9 +101,11 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     'home-destinations': HomeDestination;
+    'media-folders': MediaFolder;
   };
   globalsSelect: {
     'home-destinations': HomeDestinationsSelect<false> | HomeDestinationsSelect<true>;
+    'media-folders': MediaFoldersSelect<false> | MediaFoldersSelect<true>;
   };
   locale: null;
   widgets: {
@@ -169,6 +173,10 @@ export interface User {
  */
 export interface Media {
   id: string;
+  /**
+   * Optional folder used to organize media in the admin library.
+   */
+  folder?: string | null;
   prefix?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -181,6 +189,16 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+  sizes?: {
+    adminThumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
 }
 /**
  * Runway nights shown on Upcoming nights and the Events page. Edits autosave as drafts — Publish returns you to the events list.
@@ -274,13 +292,17 @@ export interface Gallery {
   createdAt: string;
 }
 /**
- * Model open-call submissions from the public registration form. View only — edits are not allowed.
+ * Model open-call submissions from the public registration form. Submitted details are read-only; admins can update workflow status.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "registrations".
  */
 export interface Registration {
   id: string;
+  /**
+   * Internal workflow status. Submitted form details remain read-only.
+   */
+  status?: ('new' | 'contacted' | 'shortlisted' | 'approved' | 'rejected' | 'archived') | null;
   /**
    * Auto-generated from first + last name for list views.
    */
@@ -338,13 +360,17 @@ export interface Registration {
   createdAt: string;
 }
 /**
- * Community open-call submissions (creators, media, performers, influencers, volunteers, sponsors, MUAs). View only — edits are not allowed.
+ * Community open-call submissions (creators, media, performers, influencers, volunteers, sponsors, MUAs). Submitted details are read-only; admins can update workflow status.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "community-registrations".
  */
 export interface CommunityRegistration {
   id: string;
+  /**
+   * Internal workflow status. Submitted form details remain read-only.
+   */
+  status?: ('new' | 'contacted' | 'shortlisted' | 'approved' | 'rejected' | 'archived') | null;
   /**
    * Auto-generated from first + last name for list views.
    */
@@ -385,13 +411,17 @@ export interface CommunityRegistration {
   createdAt: string;
 }
 /**
- * Designer open-call submissions from the public registration form. View only — edits are not allowed.
+ * Designer open-call submissions from the public registration form. Submitted details are read-only; admins can update workflow status.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "designer-registrations".
  */
 export interface DesignerRegistration {
   id: string;
+  /**
+   * Internal workflow status. Submitted form details remain read-only.
+   */
+  status?: ('new' | 'contacted' | 'shortlisted' | 'approved' | 'rejected' | 'archived') | null;
   /**
    * Auto-generated from first + last name for list views.
    */
@@ -434,6 +464,54 @@ export interface DesignerRegistration {
   consentLikeness: boolean;
   signatureName: string;
   signatureDate: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Publish editorial profiles for designers participating in LA Fashion Closet shows.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "press-releases".
+ */
+export interface PressRelease {
+  id: string;
+  title: string;
+  designerName: string;
+  brandName?: string | null;
+  /**
+   * Connect this profile to the runway show.
+   */
+  event?: (string | null) | Event;
+  /**
+   * Used on press cards and social previews.
+   */
+  excerpt: string;
+  /**
+   * Tell the designer’s story, collection, and show contribution.
+   */
+  body: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  portraitImage: string | Media;
+  images?: (string | Media)[] | null;
+  websiteUrl?: string | null;
+  instagramUrl?: string | null;
+  slug?: string | null;
+  publishDate?: string | null;
+  featured?: boolean | null;
+  published?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -488,6 +566,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'designer-registrations';
         value: string | DesignerRegistration;
+      } | null)
+    | ({
+        relationTo: 'press-releases';
+        value: string | PressRelease;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -558,6 +640,7 @@ export interface UsersSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
+  folder?: T;
   prefix?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -570,6 +653,20 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+  sizes?:
+    | T
+    | {
+        adminThumbnail?:
+          | T
+          | {
+              url?: T;
+              width?: T;
+              height?: T;
+              mimeType?: T;
+              filesize?: T;
+              filename?: T;
+            };
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -613,6 +710,7 @@ export interface GalleriesSelect<T extends boolean = true> {
  * via the `definition` "registrations_select".
  */
 export interface RegistrationsSelect<T extends boolean = true> {
+  status?: T;
   displayName?: T;
   title?: T;
   firstName?: T;
@@ -653,6 +751,7 @@ export interface RegistrationsSelect<T extends boolean = true> {
  * via the `definition` "community-registrations_select".
  */
 export interface CommunityRegistrationsSelect<T extends boolean = true> {
+  status?: T;
   displayName?: T;
   role?: T;
   roleOther?: T;
@@ -682,6 +781,7 @@ export interface CommunityRegistrationsSelect<T extends boolean = true> {
  * via the `definition` "designer-registrations_select".
  */
 export interface DesignerRegistrationsSelect<T extends boolean = true> {
+  status?: T;
   displayName?: T;
   title?: T;
   firstName?: T;
@@ -702,6 +802,28 @@ export interface DesignerRegistrationsSelect<T extends boolean = true> {
   consentLikeness?: T;
   signatureName?: T;
   signatureDate?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "press-releases_select".
+ */
+export interface PressReleasesSelect<T extends boolean = true> {
+  title?: T;
+  designerName?: T;
+  brandName?: T;
+  event?: T;
+  excerpt?: T;
+  body?: T;
+  portraitImage?: T;
+  images?: T;
+  websiteUrl?: T;
+  instagramUrl?: T;
+  slug?: T;
+  publishDate?: T;
+  featured?: T;
+  published?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -774,6 +896,21 @@ export interface HomeDestination {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media-folders".
+ */
+export interface MediaFolder {
+  id: string;
+  folders?:
+    | {
+        name: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "home-destinations_select".
  */
 export interface HomeDestinationsSelect<T extends boolean = true> {
@@ -782,6 +919,21 @@ export interface HomeDestinationsSelect<T extends boolean = true> {
     | {
         city?: T;
         images?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media-folders_select".
+ */
+export interface MediaFoldersSelect<T extends boolean = true> {
+  folders?:
+    | T
+    | {
+        name?: T;
         id?: T;
       };
   updatedAt?: T;

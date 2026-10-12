@@ -13,6 +13,7 @@ import { Galleries } from './collections/Galleries'
 import { Registrations } from './collections/Registrations'
 import { CommunityRegistrations } from './collections/CommunityRegistrations'
 import { DesignerRegistrations } from './collections/DesignerRegistrations'
+import { PressReleases } from './collections/PressReleases'
 import { HomeDestinations } from './globals/HomeDestinations'
 import { MediaFolders } from './globals/MediaFolders'
 
@@ -31,6 +32,12 @@ const backendURL = (process.env.PAYLOAD_BACKEND_URL || 'http://localhost:3001').
 
 const trustedOrigins = Array.from(new Set([frontendURL, serverURL, backendURL].filter(Boolean)))
 const isS3Enabled = Boolean(process.env.S3_BUCKET?.trim() && process.env.S3_REGION?.trim())
+
+if (process.env.NODE_ENV === 'production' && !isS3Enabled) {
+  throw new Error(
+    'Private media storage is not configured. S3_BUCKET and S3_REGION are required in production.',
+  )
+}
 
 export default buildConfig({
   serverURL,
@@ -53,6 +60,7 @@ export default buildConfig({
     Registrations,
     CommunityRegistrations,
     DesignerRegistrations,
+    PressReleases,
   ],
   globals: [HomeDestinations, MediaFolders],
   editor: lexicalEditor(),
