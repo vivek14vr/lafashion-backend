@@ -1,5 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
+const EVENT_DURATION_MS = 6 * 60 * 60 * 1000
+
 function slugify(title: unknown): string {
   return String(title || '')
     .toLowerCase()
@@ -12,12 +14,19 @@ function slugify(title: unknown): string {
 function dateStamp(date: unknown): string {
   const d = new Date(String(date || ''))
   if (Number.isNaN(d.getTime())) return ''
-  const y = d.getFullYear()
-  const m = String(d.getMonth() + 1).padStart(2, '0')
-  const day = String(d.getDate()).padStart(2, '0')
-  const h = String(d.getHours()).padStart(2, '0')
-  const min = String(d.getMinutes()).padStart(2, '0')
+  // Event times are floating wall-clock values. Use UTC components so the
+  // slug never changes with the server's timezone.
+  const y = d.getUTCFullYear()
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0')
+  const day = String(d.getUTCDate()).padStart(2, '0')
+  const h = String(d.getUTCHours()).padStart(2, '0')
+  const min = String(d.getUTCMinutes()).padStart(2, '0')
   return `${y}-${m}-${day}-${h}${min}`
+}
+
+function eventEndDate(date: unknown): string | undefined {
+  const time = new Date(String(date || '')).getTime()
+  return Number.isNaN(time) ? undefined : new Date(time + EVENT_DURATION_MS).toISOString()
 }
 
 function eventSlug(title: unknown, date: unknown, fallback?: string | null): string {
@@ -105,6 +114,8 @@ export const Events: CollectionConfig = {
         const date = data.date ?? originalDoc?.date
         data.slug = eventSlug(title, date, originalDoc?.slug)
         data.status = statusFromDate(date)
+        const endDate = eventEndDate(date)
+        if (endDate) data.endDate = endDate
 
         const legacyCover = data.coverImage ?? originalDoc?.coverImage
         if (legacyCover) {
@@ -121,6 +132,12 @@ export const Events: CollectionConfig = {
           delete doc.createStep
         } else if (doc.createStep == null) {
           doc.createStep = 1
+        }
+
+        // Backfill the derived end time for older events without rewriting
+        // every existing record. New saves persist it in beforeChange.
+        if (doc?.date && !doc.endDate) {
+          doc.endDate = eventEndDate(doc.date)
         }
 
         if (!doc?.date || context?.skipStatusSync) return doc
@@ -187,6 +204,16 @@ export const Events: CollectionConfig = {
               pickerAppearance: 'dayAndTime',
             },
             description: 'Also sets Upcoming vs Past automatically.',
+          },
+        },
+        {
+          name: 'endDate',
+          type: 'date',
+          label: 'End date & time',
+          admin: {
+            hidden: true,
+            readOnly: true,
+            description: 'Automatically set to six hours after the event start.',
           },
         },
         {

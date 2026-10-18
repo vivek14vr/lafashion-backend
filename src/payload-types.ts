@@ -218,6 +218,10 @@ export interface Event {
    */
   date: string;
   /**
+   * Automatically set to six hours after the event start.
+   */
+  endDate?: string | null;
+  /**
    * City, club, or location shown under the title.
    */
   venue: string;
@@ -676,6 +680,7 @@ export interface EventsSelect<T extends boolean = true> {
   createStep?: T;
   title?: T;
   date?: T;
+  endDate?: T;
   venue?: T;
   excerpt?: T;
   portraitImage?: T;
