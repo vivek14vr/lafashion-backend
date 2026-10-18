@@ -38,9 +38,9 @@ function eventSlug(title: unknown, date: unknown, fallback?: string | null): str
   return fallback || `event-${Date.now().toString(36)}`
 }
 
-function statusFromDate(date: unknown): 'upcoming' | 'past' {
+function statusFromDate(date: unknown, endDate?: unknown): 'upcoming' | 'past' {
   if (!date) return 'upcoming'
-  const eventTime = new Date(String(date)).getTime()
+  const eventTime = new Date(String(endDate || eventEndDate(date) || date)).getTime()
   if (Number.isNaN(eventTime)) return 'upcoming'
   return eventTime >= Date.now() ? 'upcoming' : 'past'
 }
@@ -113,9 +113,9 @@ export const Events: CollectionConfig = {
         const title = data.title ?? originalDoc?.title
         const date = data.date ?? originalDoc?.date
         data.slug = eventSlug(title, date, originalDoc?.slug)
-        data.status = statusFromDate(date)
         const endDate = eventEndDate(date)
         if (endDate) data.endDate = endDate
+        data.status = statusFromDate(date, endDate)
 
         const legacyCover = data.coverImage ?? originalDoc?.coverImage
         if (legacyCover) {
@@ -142,7 +142,7 @@ export const Events: CollectionConfig = {
 
         if (!doc?.date || context?.skipStatusSync) return doc
 
-        const nextStatus = statusFromDate(doc.date)
+        const nextStatus = statusFromDate(doc.date, doc.endDate)
         if (doc.status === nextStatus) return doc
 
         doc.status = nextStatus
